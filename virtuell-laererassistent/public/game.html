@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuell Lærerassistent - Interaktivt Spill</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .main-game {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .question-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .question-title {
+            color: #4a5568;
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .question-text {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #9ae6b4;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fca5a5;
+        }
+
+        .message.info {
+            background: #bee3f8;
+            color: #2b6cb0;
+            border: 1px solid #90cdf4;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, #fbb6ce 0%, #f687b3 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .student-setup {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .setup-input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .skill-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .skill-label {
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .skill-input {
+            width: 60px;
+            padding: 8px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                order: -1;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1><i class="fas fa-graduation-cap"></i> Virtuell Lærerassistent</h1>
+            <p>Interaktivt læringsspill med intelligent tilpasning</p>
+        </div>
+
+        <!-- Elevregistrering -->
+        <div id="studentSetup" class="student-setup">
+            <h2><i class="fas fa-user-plus"></i> Registrer deg som elev</h2>
+            <p>La oss komme i gang! Fyll inn dine opplysninger så vi kan tilpasse spillet til deg.</p>
+            
+            <form class="setup-form" id="setupForm">
+                <input type="text" id="studentName" class="setup-input" placeholder="Ditt navn" required>
+                
+                <h3>Dine ferdigheter (0-20)</h3>
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <label class="skill-label">Matematikk</label>
+                        <input type="number" id="mathSkill" class="skill-input" min="0" max="20" value="5">
+                    </div>
+                    <div class="skill-item">
+                        <label class="skill-label">Norsk</label>
+                        <input type="number" id="norwegianSkill" class="skill-input" min="0" max="20" value="5">
+                    </div>
+                    <div class="skill-item">
+                        <label class="skill-label">Engelsk</label>
+                        <input type="number" id="englishSkill" class="skill-input" min="0" max="20" value="5">
+                    </div>
+                    <div class="skill-item">
+                        <label class="skill-label">Naturfag</label>
+                        <input type="number" id="scienceSkill" class="skill-input" min="0" max="20" value="5">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-play"></i> Start spillet!
+                </button>
+            </form>
+        </div>
+
+        <!-- Hovedspill -->
+        <div id="gameInterface" class="game-grid hidden">
+            <div class="main-game">
+                <div id="currentQuestion" class="question-card">
+                    <div class="question-title">
+                        <i class="fas fa-brain"></i> <span id="questionTitle">Laster oppgave...</span>
+                    </div>
+                    <div class="question-text" id="questionText">
+                        Vennligst vent mens vi genererer en oppgave tilpasset ditt nivå...
+                    </div>
+                    <input type="number" id="answerInput" class="answer-input" placeholder="Skriv ditt svar her..." disabled>
+                    <div class="game-controls">
+                        <button id="submitAnswer" class="btn" disabled>
+                            <i class="fas fa-check"></i> Send svar
+                        </button>
+                        <button id="newQuestion" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> Ny oppgave
+                        </button>
+                        <button id="hintButton" class="btn btn-secondary">
+                            <i class="fas fa-lightbulb"></i> Hint
+                        </button>
+                    </div>
+                </div>
+
+                <div id="messageArea"></div>
+                <div id="achievementArea"></div>
+            </div>
+
+            <div class="sidebar">
+                <div class="stat-card">
+                    <h3><i class="fas fa-user"></i> Elev</h3>
+                    <div class="stat-value" id="studentNameDisplay">-</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-star"></i> Poeng</h3>
+                    <div class="stat-value" id="pointsDisplay">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-heart"></i> Motivasjon</h3>
+                    <div class="stat-value" id="motivationDisplay">100%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="motivationBar" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-chart-line"></i> Nivå</h3>
+                    <div class="stat-value" id="levelDisplay">1</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-calculator"></i> Matematikk</h3>
+                    <div class="stat-value" id="mathLevel">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="mathBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-book"></i> Norsk</h3>
+                    <div class="stat-value" id="norwegianLevel">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="norwegianBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-globe"></i> Engelsk</h3>
+                    <div class="stat-value" id="englishLevel">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="englishBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3><i class="fas fa-atom"></i> Naturfag</h3>
+                    <div class="stat-value" id="scienceLevel">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="scienceBar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <button id="resetGame" class="btn btn-danger" style="width: 100%;">
+                        <i class="fas fa-sync-alt"></i> Reset spill
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class VirtuellLaererassistentSpill {
+            constructor() {
+                this.currentQuestion = null;
+                this.studentData = null;
+                this.achievements = [];
+                this.isLoading = false;
+                
+                this.initEventListeners();
+                this.checkServerConnection();
+            }
+
+            initEventListeners() {
+                // Elevregistrering
+                document.getElementById('setupForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.registerStudent();
+                });
+
+                // Spillkontroller
+                document.getElementById('submitAnswer').addEventListener('click', () => {
+                    this.submitAnswer();
+                });
+
+                document.getElementById('newQuestion').addEventListener('click', () => {
+                    this.generateNewQuestion();
+                });
+
+                document.getElementById('hintButton').addEventListener('click', () => {
+                    this.showHint();
+                });
+
+                document.getElementById('resetGame').addEventListener('click', () => {
+                    this.resetGame();
+                });
+
+                // Enter-tast for å sende svar
+                document.getElementById('answerInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !document.getElementById('submitAnswer').disabled) {
+                        this.submitAnswer();
+                    }
+                });
+
+                // Auto-focus på input når det blir aktivert
+                const answerInput = document.getElementById('answerInput');
+                answerInput.addEventListener('input', () => {
+                    const submitBtn = document.getElementById('submitAnswer');
+                    submitBtn.disabled = answerInput.value.trim() === '';
+                });
+            }
+
+            async checkServerConnection() {
+                try {
+                    const response = await fetch('/api/elev/status');
+                    if (!response.ok) {
+                        throw new Error('Server ikke tilgjengelig');
+                    }
+                    console.log('✅ Tilkobling til server OK');
+                } catch (error) {
+                    this.showMessage('Kunne ikke koble til server. Sjekk at serveren kjører.', 'error');
+                    console.error('❌ Server tilkobling feilet:', error);
+                }
+            }
+
+            async registerStudent() {
+                if (this.isLoading) return;
+                
+                this.setLoading(true);
+
+                const navn = document.getElementById('studentName').value.trim();
+                const ferdigheter = {
+                    matematikk: parseInt(document.getElementById('mathSkill').value),
+                    norsk: parseInt(document.getElementById('norwegianSkill').value),
+                    engelsk: parseInt(document.getElementById('englishSkill').value),
+                    naturfag: parseInt(document.getElementById('scienceSkill').value)
+                };
+
+                try {
+                    const response = await fetch('/api/elev/registrer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ navn, ferdigheter })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.studentData = data.elevTilstand;
+                        this.showGameInterface();
+                        this.updateUI();
+                        this.generateNewQuestion();
+                        this.showMessage(`Velkommen ${navn}! Spillet er tilpasset ditt nivå.`, 'success');
+                    } else {
+                        throw new Error(data.error || 'Registrering feilet');
+                    }
+                } catch (error) {
+                    this.showMessage('Feil ved registrering: ' + error.message, 'error');
+                    console.error('Registreringsfeil:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            showGameInterface() {
+                document.getElementById('studentSetup').classList.add('hidden');
+                document.getElementById('gameInterface').classList.remove('hidden');
+            }
+
+            async generateNewQuestion() {
+                if (this.isLoading) return;
+                
+                this.setLoading(true);
+                
+                try {
+                    const response = await fetch('/api/oppgave/generer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ fag: 'matematikk' })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.currentQuestion = data.oppgave;
+                        this.displayQuestion();
+                        
+                        // Vis handlinger fra regelmotoren
+                        if (data.handlinger && data.handlinger.length > 0) {
+                            this.processRuleActions(data.handlinger);
+                        }
+                    } else {
+                        throw new Error(data.error || 'Kunne ikke generere oppgave');
+                    }
+                } catch (error) {
+                    this.showMessage('Feil ved generering av oppgave: ' + error.message, 'error');
+                    console.error('Oppgavegeneringsfeil:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            displayQuestion() {
+                if (!this.currentQuestion) return;
+
+                document.getElementById('questionTitle').textContent = this.currentQuestion.tittel;
+                document.getElementById('questionText').textContent = this.currentQuestion.spørsmål;
+                
+                const answerInput = document.getElementById('answerInput');
+                answerInput.value = '';
+                answerInput.disabled = false;
+                answerInput.focus();
+                
+                document.getElementById('submitAnswer').disabled = true;
+            }
+
+            async submitAnswer() {
+                if (this.isLoading || !this.currentQuestion) return;
+                
+                const userAnswer = parseInt(document.getElementById('answerInput').value);
+                if (isNaN(userAnswer)) {
+                    this.showMessage('Vennligst skriv inn et gyldig tall.', 'error');
+                    return;
+                }
+
+                this.setLoading(true);
+
+                try {
+                    const response = await fetch('/api/oppgave/svar', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            svar: userAnswer,
+                            fasit: this.currentQuestion.svar
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.studentData = data.elevTilstand;
+                        this.updateUI();
+                        
+                        if (data.riktig) {
+                            this.showMessage('Riktig! 🎉 Flott jobba!', 'success');
+                            this.addPoints(this.currentQuestion.poeng || 10);
+                        } else {
+                            this.showMessage(`Feil svar. Riktig svar var ${this.currentQuestion.svar}. Prøv igjen! 💪`, 'error');
+                        }
+
+                        // Behandle regelhandlinger
+                        if (data.handlinger && data.handlinger.length > 0) {
+                            this.processRuleActions(data.handlinger);
+                        }
+
+                        // Automatisk ny oppgave etter 2 sekunder
+                        setTimeout(() => {
+                            this.generateNewQuestion();
+                        }, 2000);
+
+                    } else {
+                        throw new Error(data.error || 'Feil ved behandling av svar');
+                    }
+                } catch (error) {
+                    this.showMessage('Feil ved innsending av svar: ' + error.message, 'error');
+                    console.error('Svarfeil:', error);
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+
+            processRuleActions(handlinger) {
+                handlinger.forEach(handling => {
+                    switch (handling.type) {
+                        case 'gi_tilbakemelding':
+                            setTimeout(() => {
+                                this.showMessage(handling.melding, 'info');
+                            }, 500);
+                            break;
+                        
+                        case 'foreslå_oppgave':
+                            setTimeout(() => {
+                                this.showMessage(`💡 Forslag: ${handling.oppgave.tittel}`, 'info');
+                            }, 1000);
+                            break;
+                        
+                        case 'gi_poeng':
+                            this.showAchievement(`🎯 Bonus: +${handling.mengde} poeng!`);
+                            break;
+                    }
+                });
+            }
+
+            showHint() {
+                if (!this.currentQuestion) return;
+                
+                const answer = this.currentQuestion.svar;
+                let hint = '';
+                
+                if (this.currentQuestion.tittel.includes('addisjon')) {
+                    hint = `💡 Hint: Svaret er mellom ${Math.max(0, answer - 5)} og ${answer + 5}`;
+                } else if (this.currentQuestion.tittel.includes('multiplikasjon')) {
+                    hint = `💡 Hint: Tenk på gangetabellene!`;
+                } else {
+                    hint = `💡 Hint: Ta deg god tid og tenk nøye gjennom oppgaven.`;
+                }
+                
+                this.showMessage(hint, 'info');
+            }
+
+            addPoints(points) {
+                // Visuell effekt for poeng
+                const pointsEl = document.getElementById('pointsDisplay');
+                pointsEl.style.transform = 'scale(1.2)';
+                pointsEl.style.color = '#48bb78';
+                
+                setTimeout(() => {
+                    pointsEl.style.transform = 'scale(1)';
+                    pointsEl.style.color = '#667eea';
+                }, 300);
+            }
+
+            showAchievement(message) {
+                const achievementArea = document.getElementById('achievementArea');
+                const achievement = document.createElement('div');
+                achievement.className = 'achievement';
+                achievement.textContent = message;
+                
+                achievementArea.appendChild(achievement);
+                
+                setTimeout(() => {
+                    achievement.remove();
+                }, 3000);
+            }
+
+            updateUI() {
+                if (!this.studentData) return;
+
+                document.getElementById('studentNameDisplay').textContent = this.studentData.navn;
+                document.getElementById('pointsDisplay').textContent = this.studentData.poeng;
+                document.getElementById('levelDisplay').textContent = this.studentData.nivå;
+                
+                // Motivasjon
+                const motivasjon = this.studentData.motivasjon;
+                document.getElementById('motivationDisplay').textContent = `${motivasjon}%`;
+                document.getElementById('motivationBar').style.width = `${motivasjon}%`;
+                
+                // Ferdigheter
+                const ferdigheter = this.studentData.ferdigheter;
+                Object.keys(ferdigheter).forEach(ferdighet => {
+                    const nivå = ferdigheter[ferdighet];
+                    const maxNivå = 20;
+                    const prosent = (nivå / maxNivå) * 100;
+                    
+                    if (ferdighet === 'matematikk') {
+                        document.getElementById('mathLevel').textContent = nivå;
+                        document.getElementById('mathBar').style.width = `${prosent}%`;
+                    } else if (ferdighet === 'norsk') {
+                        document.getElementById('norwegianLevel').textContent = nivå;
+                        document.getElementById('norwegianBar').style.width = `${prosent}%`;
+                    } else if (ferdighet === 'engelsk') {
+                        document.getElementById('englishLevel').textContent = nivå;
+                        document.getElementById('englishBar').style.width = `${prosent}%`;
+                    } else if (ferdighet === 'naturfag') {
+                        document.getElementById('scienceLevel').textContent = nivå;
+                        document.getElementById('scienceBar').style.width = `${prosent}%`;
+                    }
+                });
+            }
+
+            async resetGame() {
+                if (!confirm('Er du sikker på at du vil starte på nytt? All progresjon vil gå tapt.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/elev/reset', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        throw new Error(data.error || 'Reset feilet');
+                    }
+                } catch (error) {
+                    this.showMessage('Feil ved tilbakestilling: ' + error.message, 'error');
+                }
+            }
+
+            setLoading(loading) {
+                this.isLoading = loading;
+                
+                const submitBtn = document.getElementById('submitAnswer');
+                const newQuestionBtn = document.getElementById('newQuestion');
+                
+                if (loading) {
+                    submitBtn.innerHTML = '<div class="loading"></div> Sender...';
+                    newQuestionBtn.disabled = true;
+                } else {
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Send svar';
+                    newQuestionBtn.disabled = false;
+                }
+            }
+
+            showMessage(message, type = 'info') {
+                const messageArea = document.getElementById('messageArea');
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}`;
+                messageEl.textContent = message;
+                messageEl.style.display = 'block';
+                
+                messageArea.appendChild(messageEl);
+                
+                setTimeout(() => {
+                    messageEl.remove();
+                }, 5000);
+            }
+        }
+
+        // Start spillet når siden er lastet
+        document.addEventListener('DOMContentLoaded', () => {
+            new VirtuellLaererassistentSpill();
+        });
+    </script>
+</body>
+</html> 

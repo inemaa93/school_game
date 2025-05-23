@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuell Lærerassistent - Skolespill</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            background: #edf2f7;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .demo-section h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .status-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-label {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .message {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #2c7a7b;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Virtuell Lærerassistent</h1>
+        <p class="subtitle">En smart lærerassistent for skolespill med avansert regelmotor</p>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="icon">🧠</div>
+                <h3>Intelligent Regelmotor</h3>
+                <p>Tilpasser seg automatisk til elevens ferdigheter og læringsstil</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📈</div>
+                <h3>Progressjonssporing</h3>
+                <p>Følger med på elevens utvikling og motivasjonsnivå</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎮</div>
+                <h3>Spillifisering</h3>
+                <p>Motiverende spilleelementer som poeng, nivåer og utfordringer</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💬</div>
+                <h3>Personlig Veiledning</h3>
+                <p>Gir skreddersydd tilbakemelding og forslag til oppgaver</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Demo - Elev Dashboard</h2>
+            <p><strong>Elev:</strong> <span id="elevNavn">Anna Eksempel</span></p>
+            
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-label">Totale Poeng</div>
+                    <div class="status-value" id="totalPoeng">245</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Nivå</div>
+                    <div class="status-value" id="nivå">3</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Motivasjon</div>
+                    <div class="status-value" id="motivasjon">85%</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-label">Oppgaver Løst</div>
+                    <div class="status-value" id="oppgaverLøst">12</div>
+                </div>
+            </div>
+
+            <h3>Ferdigheter</h3>
+            <div style="text-align: left; margin: 1rem 0;">
+                <div style="margin: 0.5rem 0;">
+                    <strong>Matematikk: </strong><span id="matematikkNivå">15</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <strong>Norsk: </strong><span id="norskNivå">12</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+                <div style="margin: 0.5rem 0;">
+                    <strong>Engelsk: </strong><span id="engelskNivå">8</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="melding" class="message" style="display: none;"></div>
+
+            <div style="margin-top: 2rem;">
+                <button class="btn" onclick="simulerRiktigSvar()">✅ Simuler Riktig Svar</button>
+                <button class="btn" onclick="simulerFeilSvar()">❌ Simuler Feil Svar</button>
+                <button class="btn" onclick="visMelding()">💬 Vis Tilbakemelding</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem; color: #718096;">
+            <p><strong>Teknisk implementasjon:</strong></p>
+            <p>• Node.js backend med regelmotor</p>
+            <p>• JSON-baserte regler for fleksibilitet</p>
+            <p>• Jest-baserte enhetstester</p>
+            <p>• Modulær arkitektur for enkel utvidelse</p>
+        </div>
+    </div>
+
+    <script>
+        let poeng = 245;
+        let motivasjon = 85;
+        let matematikk = 15;
+        let oppgaver = 12;
+
+        function simulerRiktigSvar() {
+            poeng += 10;
+            motivasjon = Math.min(100, motivasjon + 5);
+            matematikk += 1;
+            oppgaver += 1;
+            
+            oppdaterDisplay();
+            visMelding('Fantastisk! Du svarte riktig! 🎉 (+10 poeng, +1 matematikk)', 'success');
+        }
+
+        function simulerFeilSvar() {
+            motivasjon = Math.max(0, motivasjon - 2);
+            oppgaver += 1;
+            
+            oppdaterDisplay();
+            visMelding('Ikke helt riktig, men bra forsøk! Prøv igjen! 💪', 'warning');
+        }
+
+        function visMelding(tekst = 'Lærerassistenten tilpasser seg automatisk din læringsstil og gir personaliserte oppgaver basert på dine ferdigheter og motivasjon! 🤖✨', type = 'info') {
+            const meldingEl = document.getElementById('melding');
+            meldingEl.textContent = tekst;
+            meldingEl.style.display = 'block';
+            
+            // Skjul melding etter 3 sekunder
+            setTimeout(() => {
+                meldingEl.style.display = 'none';
+            }, 3000);
+        }
+
+        function oppdaterDisplay() {
+            document.getElementById('totalPoeng').textContent = poeng;
+            document.getElementById('motivasjon').textContent = motivasjon + '%';
+            document.getElementById('matematikkNivå').textContent = matematikk;
+            document.getElementById('oppgaverLøst').textContent = oppgaver;
+            
+            // Oppdater progress bar for matematikk
+            const matematikkProgress = Math.min(100, (matematikk / 20) * 100);
+            document.querySelector('.progress-fill').style.width = matematikkProgress + '%';
+        }
+
+        // Kjør en melding ved oppstart
+        setTimeout(() => {
+            visMelding();
+        }, 1000);
+    </script>
+</body>
+</html> 

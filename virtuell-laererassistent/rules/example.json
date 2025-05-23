@@ -1,0 +1,237 @@
+{
+  "beskrivelse": "Eksempelregler for Virtuell Lærerassistent",
+  "versjon": "1.0",
+  "regler": [
+    {
+      "id": "belønning_riktig_svar",
+      "navn": "Belønning for riktig svar",
+      "beskrivelse": "Gir poeng og øker ferdighet når eleven svarer riktig",
+      "betingelser": [
+        {
+          "type": "hendelse",
+          "verdi": "riktig_svar"
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_poeng",
+          "mengde": 10
+        },
+        {
+          "type": "øk_ferdighet", 
+          "ferdighet": "matematikk",
+          "mengde": 1
+        },
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Fantastisk! Du svarte riktig! 🎉"
+        },
+        {
+          "type": "juster_motivasjon",
+          "mengde": 5
+        }
+      ]
+    },
+    {
+      "id": "oppmuntring_feil_svar",
+      "navn": "Oppmuntring ved feil svar",
+      "beskrivelse": "Gir oppmuntrende tilbakemelding ved feil svar",
+      "betingelser": [
+        {
+          "type": "hendelse",
+          "verdi": "feil_svar"
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Ikke helt riktig, men bra forsøk! Prøv igjen! 💪"
+        },
+        {
+          "type": "juster_motivasjon",
+          "mengde": -2
+        }
+      ]
+    },
+    {
+      "id": "bonus_høyt_ferdighetsnivå",
+      "navn": "Bonus for høyt ferdighetsnivå",
+      "beskrivelse": "Gir ekstra belønning når eleven har høyt ferdighetsnivå",
+      "betingelser": [
+        {
+          "type": "hendelse",
+          "verdi": "riktig_svar"
+        },
+        {
+          "type": "ferdighetsnivå",
+          "ferdighet": "matematikk",
+          "operator": ">=",
+          "verdi": 15
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_poeng",
+          "mengde": 20
+        },
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Imponerende! Du er en matematikkekspert! ⭐"
+        }
+      ]
+    },
+    {
+      "id": "motivasjonsboost_lav_motivasjon",
+      "navn": "Motivasjonsboost ved lav motivasjon",
+      "beskrivelse": "Gir ekstra oppmuntring når motivasjonen er lav",
+      "betingelser": [
+        {
+          "type": "motivasjon",
+          "operator": "<",
+          "verdi": 50
+        },
+        {
+          "type": "hendelse",
+          "verdi": "riktig_svar"
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Du klarer dette! Fortsett det gode arbeidet! 🌟"
+        },
+        {
+          "type": "juster_motivasjon",
+          "mengde": 15
+        },
+        {
+          "type": "gi_poeng",
+          "mengde": 15
+        }
+      ]
+    },
+    {
+      "id": "foreslå_utfordrende_oppgave",
+      "navn": "Foreslå utfordrende oppgave",
+      "beskrivelse": "Foreslår vanskeligere oppgaver for dyktige elever",
+      "betingelser": [
+        {
+          "type": "ferdighetsnivå",
+          "ferdighet": "matematikk",
+          "operator": ">=",
+          "verdi": 20
+        },
+        {
+          "type": "poeng",
+          "operator": ">=",
+          "verdi": 200
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "foreslå_oppgave",
+          "oppgave": {
+            "tittel": "Avansert algebraproblem",
+            "beskrivelse": "Løs ligningssystem med to ukjente",
+            "vanskelighetsgrad": "vanskelig",
+            "fag": "matematikk"
+          }
+        },
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Du er klar for en større utfordring! 🚀"
+        }
+      ]
+    },
+    {
+      "id": "grunnleggende_oppgave_nybeinner",
+      "navn": "Grunnleggende oppgave for nybegynnere",
+      "beskrivelse": "Foreslår enkle oppgaver for elever med lav ferdighet",
+      "betingelser": [
+        {
+          "type": "ferdighetsnivå",
+          "ferdighet": "matematikk",
+          "operator": "<",
+          "verdi": 5
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "foreslå_oppgave",
+          "oppgave": {
+            "tittel": "Enkel addisjon",
+            "beskrivelse": "Øv på grunnleggende addisjon med små tall",
+            "vanskelighetsgrad": "lett",
+            "fag": "matematikk"
+          }
+        },
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "La oss starte med noe enkelt! Du klarer dette! 😊"
+        }
+      ]
+    },
+    {
+      "id": "milepælsfeiring",
+      "navn": "Feiring av milepæler",
+      "beskrivelse": "Feirer når eleven når viktige milepæler",
+      "betingelser": [
+        {
+          "type": "poeng",
+          "operator": ">=",
+          "verdi": 500
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Gratulerer! Du har nådd 500 poeng! Dette er fantastisk! 🎊🏆"
+        },
+        {
+          "type": "juster_motivasjon",
+          "mengde": 25
+        },
+        {
+          "type": "gi_poeng",
+          "mengde": 50
+        }
+      ]
+    },
+    {
+      "id": "støtte_ved_gjentatte_feil",
+      "navn": "Støtte ved gjentatte feil",
+      "beskrivelse": "Gir ekstra hjelp når eleven sliter",
+      "betingelser": [
+        {
+          "type": "hendelse",
+          "verdi": "feil_svar"
+        },
+        {
+          "type": "motivasjon",
+          "operator": "<",
+          "verdi": 30
+        }
+      ],
+      "handlinger": [
+        {
+          "type": "gi_tilbakemelding",
+          "melding": "Det ser ut som du trenger litt ekstra hjelp. Skal vi prøve en lettere oppgave? 🤝"
+        },
+        {
+          "type": "foreslå_oppgave",
+          "oppgave": {
+            "tittel": "Guidet øvelse",
+            "beskrivelse": "Step-by-step veiledning gjennom problemet",
+            "vanskelighetsgrad": "lett",
+            "fag": "matematikk",
+            "medHjelp": true
+          }
+        },
+        {
+          "type": "juster_motivasjon",
+          "mengde": 10
+        }
+      ]
+    }
+  ]
+} 
